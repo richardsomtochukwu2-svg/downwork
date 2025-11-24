@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Fund Wallet - FastWork{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Add Funds to Wallet</h1>
+    <p>Deposit funds to fund your projects or escrow payments</p>
+</div>
+
+{% if not has_deposit_method %}
+<div style="background: #fef3f2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px; margin-bottom: 24px; color: #d13415;">
+    <strong>⚠️ Setup Required</strong>
+    <p style="margin-top: 8px; margin-bottom: 12px;">Before you can deposit funds, you need to set up a payment method.</p>
+    <a href="{{ url_for('setup_payment') }}" class="btn" style="display: inline-block; background: #d13415; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none;">Set Up Payment Method</a>
+</div>
+{% else %}
+
+<div class="form-container" style="max-width: 500px;">
+    <form method="POST" action="{{ url_for('fund_wallet') }}">
+        <div class="form-group">
+            <label for="amount">Amount to Deposit</label>
+            <input type="number" id="amount" name="amount" required placeholder="e.g., 50" step="0.01" min="1">
+        </div>
+
+        <div style="background: #e7f6e4; padding: 16px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #14a800;">
+            <strong>💡 About Deposits:</strong>
+            <ul style="margin-top: 8px; margin-left: 20px; font-size: 14px;">
+                <li>Funds are immediately credited to your wallet</li>
+                <li>Use funds to secure project escrow</li>
+                <li>Minimum deposit: $1</li>
+                <li>All deposits are non-refundable</li>
+            </ul>
+        </div>
+
+        <button type="submit" class="btn" style="width: 100%; padding: 14px; font-size: 16px;">Add Funds Now</button>
+    </form>
+
+    <p style="text-align: center; margin-top: 24px; color: #5e6d55; font-size: 14px;">
+        Need help? <a href="{{ url_for('report_problem') }}" style="color: #14a800; text-decoration: none;">Report a Problem</a>
+    </p>
+</div>
+
+{% endif %}
+{% endblock %}

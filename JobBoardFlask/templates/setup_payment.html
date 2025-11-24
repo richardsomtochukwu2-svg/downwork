@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Setup Payment - FastWork{% endblock %}
+
+{% block content %}
+<div class="setup-wizard">
+    <div class="wizard-card">
+        <h1>Welcome to FastWork! ⚡</h1>
+        <p class="wizard-subtitle">Let's set up your account before you start</p>
+        
+        <!-- Payment Method Setup -->
+        <div class="wizard-step">
+            <h2>Set Up Your Payment Method</h2>
+            <p style="color: #5e6d55; margin-bottom: 24px;">Add your country and preferred payment method</p>
+            
+            <form method="POST" action="{{ url_for('setup_payment') }}" id="paymentForm">
+                <input type="hidden" name="action" value="country_payment">
+                
+                <!-- Country Selection -->
+                <div class="form-group">
+                    <label>Your Country</label>
+                    <input type="text" name="country" placeholder="e.g., United States, Nigeria, India" required>
+                </div>
+
+                <!-- Payment Method Selection -->
+                <div class="form-group">
+                    <label>Preferred Payment Method</label>
+                    <select id="method_type" name="method_type" required onchange="updatePaymentFields()">
+                        <option value="">Select method</option>
+                        <option value="credit_card">💳 Credit/Debit Card</option>
+                        <option value="paypal">🔵 PayPal</option>
+                        <option value="bank_transfer">🏦 Bank Transfer</option>
+                    </select>
+                </div>
+
+                <!-- Credit Card Fields -->
+                <div id="card_section" style="display: none; background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 16px;">Card Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Card Holder Name</label>
+                            <input type="text" name="card_holder" placeholder="Name on card">
+                        </div>
+                        <div class="form-group">
+                            <label>Card Number</label>
+                            <input type="text" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Expiry (MM/YY)</label>
+                            <input type="text" name="expiry" placeholder="12/25">
+                        </div>
+                        <div class="form-group">
+                            <label>CVV</label>
+                            <input type="text" name="cvv" placeholder="123" maxlength="4">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PayPal Fields -->
+                <div id="paypal_section" style="display: none; background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 16px;">PayPal Account</h3>
+                    <div class="form-group">
+                        <label>PayPal Email</label>
+                        <input type="email" name="paypal_email" placeholder="your@paypal.com">
+                    </div>
+                </div>
+
+                <!-- Bank Transfer Fields -->
+                <div id="bank_section" style="display: none; background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 16px;">Bank Account Details</h3>
+                    <div class="form-group">
+                        <label>Bank Account Number</label>
+                        <input type="text" name="bank_account" placeholder="Your account number">
+                    </div>
+                </div>
+
+                <!-- Hidden payment_method field -->
+                <input type="hidden" name="payment_method" id="payment_method" value="credit_card">
+
+                <!-- Terms & Info -->
+                <div style="background: #e7f6e4; padding: 16px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #14a800;">
+                    <strong>💡 About Payments:</strong>
+                    <ul style="margin-top: 8px; margin-left: 20px; font-size: 14px;">
+                        <li>FastWork charges 10% commission on completed projects</li>
+                        <li>Your payment method is used for deposits and withdrawals</li>
+                        <li>All transactions are secure and encrypted</li>
+                    </ul>
+                </div>
+
+                <button type="submit" class="btn" style="width: 100%; padding: 14px; font-size: 16px;">Complete Setup & Access Wallet</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.setup-wizard {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.wizard-card {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.wizard-card h1 {
+    text-align: center;
+    margin-bottom: 8px;
+    color: #001e00;
+}
+
+.wizard-subtitle {
+    text-align: center;
+    color: #5e6d55;
+    margin-bottom: 32px;
+}
+
+.wizard-step {
+    margin-bottom: 32px;
+}
+
+.wizard-step h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+    color: #001e00;
+}
+
+.theme-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.theme-option {
+    cursor: pointer;
+}
+
+.theme-option input[type="radio"] {
+    display: none;
+}
+
+.theme-preview {
+    padding: 40px 20px;
+    border-radius: 8px;
+    text-align: center;
+    border: 3px solid transparent;
+    transition: all 0.3s;
+    font-weight: 600;
+}
+
+.theme-preview.light {
+    background: white;
+    color: #001e00;
+}
+
+.theme-preview.dark {
+    background: #333;
+    color: white;
+}
+
+.theme-option input[type="radio"]:checked + .theme-preview {
+    border-color: #14a800;
+    box-shadow: 0 0 8px rgba(20,168,0,0.3);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #001e00;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #14a800;
+    box-shadow: 0 0 0 3px rgba(20,168,0,0.1);
+}
+
+@media (max-width: 768px) {
+    .setup-wizard {
+        margin: 20px auto;
+        padding: 10px;
+    }
+
+    .wizard-card {
+        padding: 24px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .theme-selector {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+function updatePaymentFields() {
+    const method = document.getElementById('method_type').value;
+    document.getElementById('card_section').style.display = method === 'credit_card' ? 'block' : 'none';
+    document.getElementById('paypal_section').style.display = method === 'paypal' ? 'block' : 'none';
+    document.getElementById('bank_section').style.display = method === 'bank_transfer' ? 'block' : 'none';
+    document.getElementById('payment_method').value = method;
+}
+</script>
+{% endblock %}

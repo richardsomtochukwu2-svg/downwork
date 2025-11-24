@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Messages with {{ other_user['username'] }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Conversation with {{ other_user['username'] }}</h1>
+    <p><a href="{{ url_for('view_profile', user_id=other_user['id']) }}">View Profile</a></p>
+</div>
+
+<div style="background: white; border-radius: 12px; border: 1px solid #d5e0d5; padding: 24px; margin-bottom: 24px; max-height: 500px; overflow-y: auto;">
+    {% if messages %}
+        {% for msg in messages %}
+            <div style="margin-bottom: 20px; display: flex; {% if msg['sender_id'] == session.get('user_id') %}justify-content: flex-end{% endif %};">
+                <div style="max-width: 70%; padding: 16px; border-radius: 12px; {% if msg['sender_id'] == session.get('user_id') %}background: #14a800; color: white;{% else %}background: #f9faf9;{% endif %}">
+                    <p style="margin: 0;">{{ msg['message'] }}</p>
+                    <small style="display: block; margin-top: 8px; {% if msg['sender_id'] == session.get('user_id') %}color: rgba(255,255,255,0.8);{% else %}color: #5e6d55;{% endif %}">
+                        {{ msg['sent_at'] }}
+                    </small>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p style="text-align: center; color: #5e6d55;">No messages yet. Start the conversation!</p>
+    {% endif %}
+</div>
+
+<!-- Send Message Form -->
+<div style="background: white; border-radius: 12px; border: 1px solid #d5e0d5; padding: 24px;">
+    <form method="POST" action="{{ url_for('send_message', receiver_id=other_user['id']) }}">
+        <div class="form-group" style="margin-bottom: 16px;">
+            <textarea name="message" required placeholder="Type your message..." style="min-height: 100px;"></textarea>
+        </div>
+        <button type="submit" class="btn">Send Message</button>
+    </form>
+</div>
+{% endblock %}

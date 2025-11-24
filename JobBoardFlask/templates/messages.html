@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Messages</h1>
+    <p>Communicate with clients and freelancers</p>
+</div>
+
+{% if conversations %}
+    <div style="background: white; border-radius: 12px; border: 1px solid #d5e0d5;">
+        {% for conv in conversations %}
+            <a href="{{ url_for('message_thread', other_user_id=conv['other_user_id']) }}" 
+               style="display: block; padding: 20px; border-bottom: 1px solid #e8ede8; text-decoration: none; color: inherit; transition: background 0.2s;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                            <strong style="font-size: 16px;">{{ conv['other_username'] }}</strong>
+                            {% if conv['unread_count'] > 0 %}
+                                <span class="stats-badge">{{ conv['unread_count'] }} new</span>
+                            {% endif %}
+                        </div>
+                        <p style="color: #5e6d55; margin: 0;">{{ conv['last_message'][:100] }}{% if conv['last_message']|length > 100 %}...{% endif %}</p>
+                    </div>
+                    <div style="text-align: right; color: #5e6d55; font-size: 14px;">
+                        {{ conv['last_message_time'] }}
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h3>No messages yet</h3>
+        <p>Start a conversation with clients or freelancers</p>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Post a Job - JobMarket{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Post a Job</h1>
+    <p>Tell us what you need done and get started</p>
+</div>
+
+<div style="max-width: 800px; margin: 0 auto;">
+    <div style="background: white; padding: 40px; border-radius: 12px; border: 1px solid #d5e0d5;">
+        <form method="POST" action="{{ url_for('post_job') }}">
+            <div class="form-group">
+                <label for="title">Job Title</label>
+                <input type="text" id="title" name="title" required placeholder="e.g., Build a responsive website for my business">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Job Description</label>
+                <textarea id="description" name="description" required placeholder="Describe the work you need done, required skills, project timeline, and any other relevant details..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="category_id">Category</label>
+                <select id="category_id" name="category_id">
+                    <option value="">Select a category (optional)</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat['id'] }}">{{ cat['name'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="budget">Budget ($) <span style="color: #d13415;">*</span></label>
+                <input type="number" id="budget" name="budget" step="0.01" required placeholder="Enter your budget (required)">
+                <small style="color: #5e6d55;">Your current balance: <strong>${{ "%.2f"|format(balance) }}</strong></small>
+            </div>
+
+            <div class="form-group">
+                <label for="duration">Project Duration</label>
+                <select id="duration" name="duration">
+                    <option value="">Select duration (optional)</option>
+                    <option value="Less than 1 week">Less than 1 week</option>
+                    <option value="1-2 weeks">1-2 weeks</option>
+                    <option value="2-4 weeks">2-4 weeks</option>
+                    <option value="1-2 months">1-2 months</option>
+                    <option value="2-3 months">2-3 months</option>
+                    <option value="3+ months">3+ months</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="experience_level">Experience Level Required</label>
+                <select id="experience_level" name="experience_level">
+                    <option value="">Select experience level (optional)</option>
+                    <option value="Entry Level">Entry Level</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Expert">Expert</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 32px;">
+                <button type="submit" class="btn">Post Job</button>
+                <a href="{{ url_for('client_dashboard') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

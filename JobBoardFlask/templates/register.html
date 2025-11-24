@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - FastWork{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1 style="text-align: center; margin-bottom: 8px;">Join FastWork</h1>
+    <p style="text-align: center; color: #5e6d55; margin-bottom: 32px;">Connect with clients and freelancers worldwide</p>
+
+    <form method="POST" action="{{ url_for('register') }}" enctype="multipart/form-data">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required placeholder="Choose your username">
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required placeholder="your@email.com">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required placeholder="+1 (555) 123-4567">
+            </div>
+            <div class="form-group">
+                <label for="country">Country</label>
+                <input type="text" id="country" name="country" required placeholder="Your country">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Create a strong password">
+            </div>
+            <div class="form-group">
+                <label for="role">I want to</label>
+                <select id="role" name="role" required>
+                    <option value="">Select your role</option>
+                    <option value="client">Hire for a project (I'm a client)</option>
+                    <option value="freelancer">Work as a freelancer</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="profile_picture">Profile Picture</label>
+                <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+            </div>
+            <div class="form-group">
+                <label for="skills">What are you good at?</label>
+                <input type="text" id="skills" name="skills" placeholder="e.g., Web Development, Design">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="withdrawal_method">Preferred Withdrawal Method</label>
+            <select id="withdrawal_method" name="withdrawal_method">
+                <option value="">Select preferred method</option>
+                <option value="bank_transfer">Bank Transfer</option>
+                <option value="paypal">PayPal</option>
+                <option value="crypto">Cryptocurrency Wallet</option>
+                <option value="mobile_money">Mobile Money</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn" style="width: 100%; margin-top: 16px;">Create my account</button>
+    </form>
+
+    <p style="text-align: center; margin-top: 24px; color: #5e6d55;">
+        Already have an account? <a href="{{ url_for('login') }}">Log in</a>
+    </p>
+    <p style="text-align: center; color: #999; font-size: 12px; margin-top: 12px;">
+        FastWork charges 10% commission on all completed projects
+    </p>
+</div>
+
+<style>
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

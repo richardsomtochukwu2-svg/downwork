@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Withdraw Funds - FastWork{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Request Withdrawal</h1>
+    <p>Withdraw your earnings to your bank account</p>
+</div>
+
+<div style="max-width: 500px; margin: 0 auto;">
+    <div style="background: white; padding: 40px; border-radius: 12px; border: 1px solid #d5e0d5;">
+        <div style="background: #e7f6e4; padding: 16px; border-radius: 8px; margin-bottom: 24px; border-left: 4px solid #14a800;">
+            <strong>💰 Available Balance:</strong>
+            <h2 style="margin-top: 8px; color: #14a800;">${{ "%.2f"|format(balance) }}</h2>
+        </div>
+
+        <form method="POST" action="{{ url_for('request_withdrawal') }}">
+            <div class="form-group">
+                <label for="amount">Withdrawal Amount ($) <span style="color: #d13415;">*</span></label>
+                <input type="number" id="amount" name="amount" required placeholder="e.g., 100" step="0.01" min="1">
+                <small style="color: #5e6d55;">Minimum withdrawal: $1</small>
+            </div>
+
+            {% if profile and profile['withdrawal_method'] %}
+            <div style="background: #f2f7f2; padding: 16px; border-radius: 8px; margin: 24px 0;">
+                <p style="color: #5e6d55; margin: 0;"><strong>Withdrawal Method:</strong></p>
+                <p style="color: #001e00; font-size: 18px; margin-top: 8px;">{{ profile['withdrawal_method'].title() }}</p>
+            </div>
+            {% endif %}
+
+            <div style="background: #fef3f2; padding: 16px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #fecaca;">
+                <strong style="color: #d13415;">⏱️ Processing Time:</strong>
+                <p style="margin-top: 8px; color: #5e6d55; font-size: 14px;">Withdrawals typically process within 2-3 business days.</p>
+            </div>
+
+            <button type="submit" class="btn" style="width: 100%; padding: 14px; font-size: 16px;">Request Withdrawal</button>
+        </form>
+
+        <p style="text-align: center; margin-top: 24px; color: #5e6d55; font-size: 14px;">
+            Need to change your withdrawal method? <a href="{{ url_for('settings') }}" style="color: #14a800; text-decoration: none;">Go to Settings</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

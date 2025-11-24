@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - FastWork{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Settings</h1>
+    <p>Manage your account preferences</p>
+</div>
+
+<div class="settings-container">
+    <!-- Background Color Settings -->
+    <div class="settings-card">
+        <h2>Appearance</h2>
+        <form method="POST" action="{{ url_for('settings') }}" id="themeForm">
+            <input type="hidden" name="action" value="background_color">
+            <label>Background Theme</label>
+            <div style="margin-top: 12px; display: flex; gap: 16px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="background_color" value="white" 
+                           onclick="switchTheme('white')"
+                           {% if user['background_color'] == 'white' or not user['background_color'] %}checked{% endif %}>
+                    <span style="width: 40px; height: 40px; background: white; border: 1px solid #ddd; border-radius: 4px;"></span>
+                    Light
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.2s;">
+                    <input type="radio" name="background_color" value="black" 
+                           onclick="switchTheme('black')"
+                           {% if user['background_color'] == 'black' %}checked{% endif %}>
+                    <span style="width: 40px; height: 40px; background: #333; border: 1px solid #ddd; border-radius: 4px;"></span>
+                    Dark
+                </label>
+            </div>
+            <button type="submit" class="btn" style="margin-top: 16px;">Save Theme</button>
+        </form>
+    </div>
+
+    <!-- Report a Problem -->
+    <div class="settings-card">
+        <h2>Support</h2>
+        <p style="color: #5e6d55; margin-bottom: 16px;">Having an issue? Let us know and our support team will help.</p>
+        <a href="{{ url_for('report_problem') }}" class="btn" style="display: inline-block;">Report a Problem</a>
+    </div>
+</div>
+
+<style>
+.settings-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+.settings-card {
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.settings-card h2 {
+    margin-bottom: 16px;
+    color: #001e00;
+    font-size: 20px;
+}
+
+.settings-card h3 {
+    margin-top: 16px;
+    margin-bottom: 12px;
+    color: #333;
+    font-size: 16px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+function updatePaymentForm() {
+    const method = document.getElementById('method_type').value;
+    document.getElementById('credit_card_form').style.display = method === 'credit_card' ? 'block' : 'none';
+    document.getElementById('paypal_form').style.display = method === 'paypal' ? 'block' : 'none';
+    document.getElementById('bank_form').style.display = method === 'bank_transfer' ? 'block' : 'none';
+}
+
+function updateWithdrawalForm() {
+    const method = document.getElementById('withdrawal_method_select').value;
+    document.getElementById('paypal_details').style.display = method === 'paypal' ? 'block' : 'none';
+    document.getElementById('crypto_details').style.display = method === 'crypto' ? 'block' : 'none';
+    document.getElementById('bank_details').style.display = method === 'bank_transfer' ? 'block' : 'none';
+}
+
+// Initialize withdrawal form on page load
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('withdrawal_method_select')) {
+        updateWithdrawalForm();
+    }
+});
+
+function switchTheme(theme) {
+    // Apply theme immediately
+    const body = document.getElementById('mainBody');
+    if (theme === 'black') {
+        body.classList.add('dark-mode');
+        body.style.backgroundColor = '#1a1a1a';
+        body.style.color = '#f0f0f0';
+    } else {
+        body.classList.remove('dark-mode');
+        body.style.backgroundColor = '#f2f7f2';
+        body.style.color = '#001e00';
+    }
+    
+    // Store in localStorage and submit form
+    localStorage.setItem('theme', theme);
+    document.getElementById('themeForm').submit();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Find Work - Browse Jobs{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Find work</h1>
+    <p>Browse thousands of jobs and submit proposals</p>
+</div>
+
+<!-- Search and Filter Bar -->
+<div style="background: white; padding: 24px; border-radius: 12px; margin-bottom: 24px; border: 1px solid #d5e0d5;">
+    <form method="GET" action="{{ url_for('browse_jobs') }}">
+        <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 16px; align-items: end;">
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="search">Search jobs</label>
+                <input type="text" id="search" name="search" value="{{ search }}" placeholder="Search by title or description">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 0;">
+                <label for="category">Category</label>
+                <select id="category" name="category">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat['id'] }}" {% if selected_category == cat['id']|string %}selected{% endif %}>{{ cat['name'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button type="submit" class="btn">Search</button>
+        </div>
+    </form>
+</div>
+
+{% if jobs %}
+    <div class="jobs-grid">
+        {% for item in jobs %}
+        <div class="job-card">
+            <h3 class="job-title">
+                <a href="{{ url_for('view_job', job_id=item.job['id']) }}">{{ item.job['title'] }}</a>
+            </h3>
+            <div class="job-meta">
+                <span class="job-meta-item">Posted by <strong>{{ item.job['client_name'] }}</strong></span>
+                <span class="job-meta-item">{{ item.job['created_at'] }}</span>
+                {% if item.job['category_name'] %}
+                    <span class="stats-badge">{{ item.job['category_name'] }}</span>
+                {% endif %}
+            </div>
+            <p class="job-description">{{ item.job['description'][:250] }}{% if item.job['description']|length > 250 %}...{% endif %}</p>
+            
+            <div class="job-footer">
+                <div style="display: flex; gap: 16px;">
+                    {% if item.job['budget'] %}
+                        <span><strong>Budget:</strong> ${{ item.job['budget'] }}</span>
+                    {% endif %}
+                    {% if item.job['duration'] %}
+                        <span><strong>Duration:</strong> {{ item.job['duration'] }}</span>
+                    {% endif %}
+                </div>
+                <div>
+                    {% if item.has_applied %}
+                        <span class="btn btn-success btn-small">✓ Proposal submitted</span>
+                    {% elif session.get('user_id') %}
+                        <a href="{{ url_for('submit_proposal', job_id=item.job['id']) }}" class="btn btn-small">Submit Proposal</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-small">Submit Proposal</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h3>No jobs found</h3>
+        <p>Try adjusting your search or filters</p>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Find Work & Hire Talent - FastWork{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body id="mainBody">
+    <!-- Top Navigation Bar -->
+    <div class="top-nav">
+        <div class="nav-container">
+            <a href="{{ url_for('index') }}" class="logo">⚡ FastWork</a>
+            
+            <div class="nav-links">
+                {% if session.get('user_id') %}
+                    {% if session.get('role') == 'client' %}
+                        <a href="{{ url_for('post_job') }}">Post a Job</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{{ url_for('login') }}">Log In</a>
+                    <a href="{{ url_for('register') }}" class="btn btn-small">Sign Up</a>
+                {% endif %}
+            </div>
+
+            {% if session.get('user_id') %}
+            <div class="user-menu">
+                <button class="profile-btn" onclick="toggleDropdown()">
+                    {% if session.get('profile_picture') %}
+                        <img src="{{ url_for('static', filename=session.get('profile_picture')) }}" class="profile-pic" alt="Profile">
+                    {% else %}
+                        👤
+                    {% endif %}
+                    <span>{{ session.get('username') }}</span>
+                    <span class="dropdown-arrow">⋯</span>
+                </button>
+                
+                <div class="dropdown-menu" id="userDropdown">
+                    <a href="{{ url_for('view_profile', user_id=session.get('user_id')) }}" class="dropdown-item">👤 My Profile</a>
+                    <a href="{{ url_for('wallet') }}" class="dropdown-item">💰 Wallet</a>
+                    <a href="{{ url_for('messages') }}" class="dropdown-item">✉️ Messages</a>
+                    <a href="{{ url_for('notifications') }}" class="dropdown-item">🔔 Notifications</a>
+                    <a href="{{ url_for('settings') }}" class="dropdown-item">⚙️ Settings</a>
+                    <hr style="margin: 8px 0; border: none; border-top: 1px solid #ddd;">
+                    <a href="{{ url_for('report_problem') }}" class="dropdown-item">🐛 Report a Problem</a>
+                    <a href="{{ url_for('logout') }}" class="dropdown-item" style="color: #d13415;">Logout</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container" style="padding-top: 24px; padding-bottom: 0;">
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Bottom Navigation for Mobile -->
+    {% if session.get('user_id') %}
+    <div class="bottom-nav">
+        <a href="{{ url_for('dashboard') }}" class="bottom-nav-item">📊 Dashboard</a>
+        
+        {% if session.get('role') == 'client' %}
+            <a href="{{ url_for('post_job') }}" class="bottom-nav-item">➕ Post Job</a>
+        {% elif session.get('role') == 'freelancer' %}
+            <a href="{{ url_for('browse_jobs') }}" class="bottom-nav-item">🔍 Find Work</a>
+        {% endif %}
+        
+        <a href="{{ url_for('wallet') }}" class="bottom-nav-item">💰 Wallet</a>
+        <a href="{{ url_for('messages') }}" class="bottom-nav-item">✉️ Messages</a>
+        <a href="{{ url_for('notifications') }}" class="bottom-nav-item">🔔 Notifs</a>
+    </div>
+    {% endif %}
+
+    <!-- Update badge counts and theme -->
+    <script>
+        // Apply theme on page load
+        function applyTheme() {
+            const theme = localStorage.getItem('theme') || 'white';
+            const body = document.getElementById('mainBody');
+            if (body) {
+                if (theme === 'black') {
+                    body.classList.add('dark-mode');
+                    body.style.backgroundColor = '#1a1a1a';
+                    body.style.color = '#f0f0f0';
+                } else {
+                    body.classList.remove('dark-mode');
+                    body.style.backgroundColor = '#f2f7f2';
+                    body.style.color = '#001e00';
+                }
+            }
+        }
+        applyTheme();
+
+        {% if session.get('user_id') %}
+        function toggleDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        window.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('userDropdown');
+            const btn = document.querySelector('.profile-btn');
+            if (!e.target.closest('.user-menu')) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        function updateCounts() {
+            fetch('/api/counts')
+                .then(response => response.json())
+                .then(data => {
+                    // Update notification in dropdown if needed
+                });
+        }
+        
+        updateCounts();
+        setInterval(updateCounts, 30000);
+        {% endif %}
+    </script>
+</body>
+</html>

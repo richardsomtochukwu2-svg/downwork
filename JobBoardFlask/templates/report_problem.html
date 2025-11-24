@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Report a Problem - FastWork{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Report a Problem</h1>
+    <p>Help us improve FastWork by reporting issues or concerns</p>
+</div>
+
+<div class="form-container" style="max-width: 600px;">
+    <form method="POST" action="{{ url_for('report_problem') }}">
+        <div class="form-group">
+            <label for="category">What's the issue about?</label>
+            <select id="category" name="category" required>
+                <option value="">Select a category</option>
+                <option value="payment">💰 Payment & Billing</option>
+                <option value="account">👤 Account & Security</option>
+                <option value="job_posting">📝 Job Posting</option>
+                <option value="proposal">📬 Proposal System</option>
+                <option value="messaging">💬 Messaging</option>
+                <option value="payment_method">🏦 Payment Methods</option>
+                <option value="profile">👥 Profile Issues</option>
+                <option value="technical">🛠️ Technical Issue</option>
+                <option value="fraud">⚠️ Fraud or Misconduct</option>
+                <option value="other">❓ Other</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" required placeholder="Brief description of the issue">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Detailed Description</label>
+            <textarea id="description" name="description" rows="8" required placeholder="Please provide as much detail as possible to help us investigate and resolve this issue quickly."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" value="{% if user %}{{ user['email'] or '' }}{% endif %}" placeholder="We'll use this to follow up with you">
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone Number (Optional)</label>
+            <input type="tel" id="phone" name="phone" placeholder="+1 (555) 123-4567">
+        </div>
+
+        <div class="form-group">
+            <label for="severity">Severity Level</label>
+            <select id="severity" name="severity">
+                <option value="low">🟢 Low - Inconvenience but not blocking work</option>
+                <option value="medium" selected>🟡 Medium - Affecting my work</option>
+                <option value="high">🔴 High - Blocking important functionality</option>
+                <option value="critical">🚨 Critical - Security or account issue</option>
+            </select>
+        </div>
+
+        <div style="background: #e7f6e4; padding: 16px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #14a800;">
+            <strong>📋 What happens next?</strong>
+            <ul style="margin-top: 8px; margin-left: 20px; font-size: 14px;">
+                <li>Our support team will review your report within 24 hours</li>
+                <li>We'll contact you via email or phone with updates</li>
+                <li>For fraud reports, we'll prioritize investigation immediately</li>
+                <li>You can track your report status in your notifications</li>
+            </ul>
+        </div>
+
+        <button type="submit" class="btn" style="width: 100%; padding: 14px; font-size: 16px;">Submit Report</button>
+    </form>
+
+    <p style="text-align: center; margin-top: 24px; color: #5e6d55; font-size: 14px;">
+        For urgent security concerns, please contact us at <strong>security@fastwork.com</strong>
+    </p>
+</div>
+
+<style>
+textarea {
+    font-family: inherit;
+    resize: vertical;
+}
+</style>
+{% endblock %}

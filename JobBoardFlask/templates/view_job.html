@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job['title'] }}{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+    <!-- Job Details -->
+    <div>
+        <div style="background: white; padding: 32px; border-radius: 12px; border: 1px solid #d5e0d5; margin-bottom: 24px;">
+            <h1 style="margin-bottom: 16px;">{{ job['title'] }}</h1>
+            
+            <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+                <span style="color: #5e6d55;">Posted by <strong>{{ job['client_name'] }}</strong></span>
+                <span style="color: #5e6d55;">{{ job['created_at'] }}</span>
+                {% if job['category_name'] %}
+                    <span class="stats-badge">{{ job['category_name'] }}</span>
+                {% endif %}
+                <span class="stats-badge">{{ job['proposal_count'] }} proposals</span>
+            </div>
+            
+            <h3 style="margin-bottom: 16px;">Description</h3>
+            <p style="line-height: 1.7; margin-bottom: 24px; white-space: pre-line;">{{ job['description'] }}</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e8ede8;">
+                {% if job['budget'] %}
+                    <div>
+                        <small style="color: #5e6d55; display: block; margin-bottom: 4px;">Budget</small>
+                        <strong style="font-size: 18px;">${{ job['budget'] }}</strong>
+                    </div>
+                {% endif %}
+                
+                {% if job['duration'] %}
+                    <div>
+                        <small style="color: #5e6d55; display: block; margin-bottom: 4px;">Duration</small>
+                        <strong style="font-size: 18px;">{{ job['duration'] }}</strong>
+                    </div>
+                {% endif %}
+                
+                {% if job['experience_level'] %}
+                    <div>
+                        <small style="color: #5e6d55; display: block; margin-bottom: 4px;">Experience Level</small>
+                        <strong style="font-size: 18px;">{{ job['experience_level'] }}</strong>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Proposals (Client View) -->
+        {% if proposals %}
+            <div style="background: white; padding: 32px; border-radius: 12px; border: 1px solid #d5e0d5;">
+                <h2 style="margin-bottom: 24px;">Proposals ({{ proposals|length }})</h2>
+                
+                {% for proposal in proposals %}
+                    <div style="padding: 24px; background: #f9faf9; border-radius: 8px; margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                            <div>
+                                <a href="{{ url_for('view_profile', user_id=proposal['freelancer_id']) }}" style="font-size: 18px; font-weight: 600;">
+                                    {{ proposal['freelancer_name'] }}
+                                </a>
+                                {% if proposal['rating'] and proposal['rating'] > 0 %}
+                                    <p style="color: #5e6d55; margin-top: 4px;">⭐ {{ "%.1f"|format(proposal['rating']) }} ({{ proposal['total_jobs'] }} jobs)</p>
+                                {% endif %}
+                            </div>
+                            <div style="text-align: right;">
+                                <p style="font-size: 24px; font-weight: 600; color: #14a800;">${{ proposal['bid_amount'] }}</p>
+                                {% if proposal['delivery_time'] %}
+                                    <small style="color: #5e6d55;">{{ proposal['delivery_time'] }} days</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <p style="margin-bottom: 16px; white-space: pre-line;">{{ proposal['cover_letter'] }}</p>
+                        
+                        <div style="display: flex; gap: 12px;">
+                            {% if proposal['status'] == 'pending' %}
+                                <form method="POST" action="{{ url_for('accept_proposal', proposal_id=proposal['id']) }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-small">Accept Proposal</button>
+                                </form>
+                                <a href="{{ url_for('message_thread', other_user_id=proposal['freelancer_id']) }}" class="btn btn-outline btn-small">Message</a>
+                            {% else %}
+                                <span class="stats-badge">{{ proposal['status'].title() }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar -->
+    <div>
+        <div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #d5e0d5; position: sticky; top: 90px;">
+            {% if session.get('role') == 'freelancer' and not has_applied and job['status'] == 'open' %}
+                <a href="{{ url_for('submit_proposal', job_id=job['id']) }}" class="btn" style="width: 100%; margin-bottom: 16px;">Submit a Proposal</a>
+            {% elif has_applied %}
+                <div class="stats-badge" style="width: 100%; text-align: center; padding: 12px; margin-bottom: 16px;">✓ Proposal Submitted</div>
+            {% elif job['status'] != 'open' %}
+                <div class="stats-badge" style="width: 100%; text-align: center; padding: 12px; margin-bottom: 16px; background: #f8d7da; color: #721c24;">Job Closed</div>
+            {% endif %}
+            
+            <div style="padding-top: 16px; border-top: 1px solid #e8ede8;">
+                <h3 style="margin-bottom: 16px;">About the Client</h3>
+                <p style="margin-bottom: 12px;"><strong>{{ job['client_name'] }}</strong></p>
+                <a href="{{ url_for('view_profile', user_id=job['client_id']) }}" class="btn btn-outline btn-small" style="width: 100%;">View Client Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

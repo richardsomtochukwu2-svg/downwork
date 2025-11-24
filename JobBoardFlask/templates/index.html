@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Hire Freelancers & Find Freelance Jobs Online - JobMarket{% endblock %}
+
+{% block content %}
+{% if not session.get('user_id') %}
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h1>How the world works</h1>
+        <p>Connecting clients in need to freelancers who deliver</p>
+        <div style="display: flex; gap: 16px; justify-content: center; margin-top: 32px;">
+            <a href="{{ url_for('register') }}" class="btn btn-large">Get Started</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline btn-large">Log In</a>
+        </div>
+    </div>
+
+    <!-- Categories -->
+    {% if categories %}
+        <div style="margin-top: 48px;">
+            <h2 style="margin-bottom: 24px;">Browse by category</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
+                {% for cat in categories %}
+                    <a href="{{ url_for('browse_jobs', category=cat['id']) }}" 
+                       style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #d5e0d5; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;">
+                        <h3 style="font-size: 16px; margin-bottom: 8px; color: #001e00;">{{ cat['name'] }}</h3>
+                        <p style="font-size: 14px; color: #5e6d55; margin: 0;">{{ cat['description'][:60] }}...</p>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Recent Jobs -->
+    {% if recent_jobs %}
+        <div style="margin-top: 48px;">
+            <h2 style="margin-bottom: 24px;">Recent job posts</h2>
+            <div class="jobs-grid">
+                {% for job in recent_jobs %}
+                    <div class="job-card">
+                        <h3 class="job-title">
+                            <a href="{{ url_for('view_job', job_id=job['id']) }}">{{ job['title'] }}</a>
+                        </h3>
+                        <div class="job-meta">
+                            <span>Posted by <strong>{{ job['client_name'] }}</strong></span>
+                            {% if job['category_name'] %}
+                                <span class="stats-badge">{{ job['category_name'] }}</span>
+                            {% endif %}
+                            <span class="stats-badge">{{ job['proposal_count'] }} proposals</span>
+                        </div>
+                        <p class="job-description">{{ job['description'][:200] }}...</p>
+                        <div class="job-footer">
+                            {% if job['budget'] %}
+                                <span><strong>Budget:</strong> ${{ job['budget'] }}</span>
+                            {% endif %}
+                            <a href="{{ url_for('view_job', job_id=job['id']) }}" class="btn btn-small">View Job</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Role Cards -->
+    <div class="role-cards" style="margin-top: 48px;">
+        <div class="role-card">
+            <h3>For Clients</h3>
+            <p>Find talented freelancers to help with your projects. Post jobs and get proposals from qualified professionals.</p>
+            <a href="{{ url_for('register') }}" class="btn">Hire Talent</a>
+        </div>
+        <div class="role-card">
+            <h3>For Freelancers</h3>
+            <p>Browse thousands of jobs and apply to projects that match your skills. Build your career on your terms.</p>
+            <a href="{{ url_for('register') }}" class="btn">Find Work</a>
+        </div>
+    </div>
+{% else %}
+    <!-- Logged In User -->
+    <div class="hero-section">
+        <h1>Welcome back, {{ session.get('username') }}!</h1>
+        <p>You're logged in as a <strong>{{ session.get('role') }}</strong></p>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-large" style="margin-top: 24px;">Go to Dashboard</a>
+    </div>
+    
+    <!-- Recent Jobs for logged in users -->
+    {% if recent_jobs %}
+        <div style="margin-top: 48px;">
+            <h2 style="margin-bottom: 24px;">Recently posted jobs</h2>
+            <div class="jobs-grid">
+                {% for job in recent_jobs[:3] %}
+                    <div class="job-card">
+                        <h3 class="job-title">
+                            <a href="{{ url_for('view_job', job_id=job['id']) }}">{{ job['title'] }}</a>
+                        </h3>
+                        <div class="job-meta">
+                            <span>Posted by <strong>{{ job['client_name'] }}</strong></span>
+                            {% if job['category_name'] %}
+                                <span class="stats-badge">{{ job['category_name'] }}</span>
+                            {% endif %}
+                        </div>
+                        <p class="job-description">{{ job['description'][:150] }}...</p>
+                    </div>
+                {% endfor %}
+            </div>
+            <div style="text-align: center; margin-top: 24px;">
+                <a href="{{ url_for('browse_jobs') }}" class="btn">View All Jobs</a>
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
+{% endblock %}

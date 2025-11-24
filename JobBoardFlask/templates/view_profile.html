@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user['username'] }}'s Profile{% endblock %}
+
+{% block content %}
+<div style="background: white; padding: 40px; border-radius: 12px; border: 1px solid #d5e0d5; margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 24px;">
+        <div>
+            <h1 style="margin-bottom: 8px;">{{ user['username'] if user else 'User' }}</h1>
+            {% if profile and profile['title'] %}
+                <p style="font-size: 18px; color: #5e6d55; margin-bottom: 16px;">{{ profile['title'] }}</p>
+            {% endif %}
+            
+            <div style="display: flex; gap: 24px; margin-top: 16px;">
+                {% if profile and profile['rating'] and profile['rating'] > 0 %}
+                    <div>
+                        <span style="font-size: 24px; font-weight: 600; color: #14a800;">⭐ {{ "%.1f"|format(profile['rating']) }}</span>
+                        <small style="color: #5e6d55; display: block;">({{ profile['reviews_count'] }} reviews)</small>
+                    </div>
+                {% endif %}
+                
+                {% if profile and profile['total_jobs'] and profile['total_jobs'] > 0 %}
+                    <div>
+                        <span style="font-size: 24px; font-weight: 600;">{{ profile['total_jobs'] }}</span>
+                        <small style="color: #5e6d55; display: block;">Jobs completed</small>
+                    </div>
+                {% endif %}
+                
+                {% if profile and profile['hourly_rate'] %}
+                    <div>
+                        <span style="font-size: 24px; font-weight: 600;">${{ profile['hourly_rate'] }}/hr</span>
+                        <small style="color: #5e6d55; display: block;">Hourly rate</small>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div>
+            {% if session.get('user_id') == user['id'] %}
+                <a href="{{ url_for('edit_profile') }}" class="btn">Edit Profile</a>
+            {% elif session.get('user_id') %}
+                <a href="{{ url_for('message_thread', other_user_id=user['id']) }}" class="btn">Send Message</a>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if profile and profile['bio'] %}
+        <h3 style="margin-top: 32px; margin-bottom: 16px;">About</h3>
+        <p style="line-height: 1.7; color: #001e00;">{{ profile['bio'] }}</p>
+    {% endif %}
+    
+    {% if profile and profile['skills'] %}
+        <h3 style="margin-top: 32px; margin-bottom: 16px;">Skills</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            {% for skill in profile['skills'].split(',') %}
+                <span class="stats-badge">{{ skill.strip() }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    {% if profile and profile['location'] %}
+        <p style="margin-top: 24px; color: #5e6d55;">📍 {{ profile['location'] }}</p>
+    {% endif %}
+</div>
+
+<!-- Reviews Section -->
+{% if reviews %}
+    <div style="background: white; padding: 40px; border-radius: 12px; border: 1px solid #d5e0d5;">
+        <h2 style="margin-bottom: 24px;">Reviews</h2>
+        
+        {% for review in reviews %}
+            <div style="padding: 20px; background: #f9faf9; border-radius: 8px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                    <strong>{{ review['reviewer_name'] }}</strong>
+                    <span>{% for i in range(review['rating']) %}⭐{% endfor %}</span>
+                </div>
+                {% if review['comment'] %}
+                    <p style="color: #5e6d55;">{{ review['comment'] }}</p>
+                {% endif %}
+                <small style="color: #5e6d55; display: block; margin-top: 8px;">{{ review['created_at'] }}</small>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

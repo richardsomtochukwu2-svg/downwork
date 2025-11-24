@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Wallet{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Wallet</h1>
+    <p>Manage your earnings and payments</p>
+</div>
+
+<div style="background: linear-gradient(135deg, #14a800 0%, #108a00 100%); color: white; padding: 40px; border-radius: 12px; margin-bottom: 24px;">
+    <div>
+        <p style="font-size: 16px; margin-bottom: 8px; opacity: 0.9;">Available Balance</p>
+        <h1 style="font-size: 48px; font-weight: 700;">${{ "%.2f"|format(balance) }}</h1>
+    </div>
+    <div style="margin-top: 32px; display: flex; gap: 16px;">
+        {% if user_role == 'client' %}
+            {% if has_deposit_method %}
+                <a href="{{ url_for('fund_wallet') }}" class="btn btn-outline" style="border-color: white; color: white; text-decoration: none;">Add Funds</a>
+            {% else %}
+                <button class="btn btn-outline" style="border-color: white; color: white; opacity: 0.5; cursor: not-allowed;" disabled title="Please set up a deposit method first">Add Funds</button>
+            {% endif %}
+        {% elif user_role == 'freelancer' %}
+            {% if has_withdrawal_method %}
+                <a href="{{ url_for('request_withdrawal') }}" class="btn btn-outline" style="background: white; color: #14a800; border-color: white; text-decoration: none;">Withdraw Funds</a>
+            {% else %}
+                <button class="btn btn-outline" style="background: white; color: #14a800; border-color: white; opacity: 0.5; cursor: not-allowed;" disabled title="Please set up a withdrawal method first">Withdraw Funds</button>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+<!-- Payment Methods (for clients) -->
+{% if user_role == 'client' and payment_methods %}
+<div style="background: white; border-radius: 12px; border: 1px solid #d5e0d5; padding: 24px; margin-bottom: 24px;">
+    <h2 style="margin-bottom: 24px;">Deposit Methods</h2>
+    {% for method in payment_methods %}
+    <div style="background: #f9f9f9; padding: 16px; border-radius: 6px; margin-bottom: 12px;">
+        {% if method['type'] == 'credit_card' %}
+            💳 Card ending in {{ method['card_number'][-4:] }} ({{ method['card_holder'] }})
+        {% elif method['type'] == 'paypal' %}
+            🔵 PayPal - {{ method['paypal_email'] }}
+        {% elif method['type'] == 'bank_transfer' %}
+            🏦 Bank - {{ method['bank_account'] }}
+        {% endif %}
+    </div>
+    {% endfor %}
+    <p style="margin-top: 12px; font-size: 14px; color: #5e6d55;">
+        <a href="{{ url_for('settings') }}" style="color: #14a800; text-decoration: none;">Manage payment methods</a>
+    </p>
+</div>
+{% endif %}
+
+<!-- Withdrawal Details (for freelancers) -->
+{% if user_role == 'freelancer' and profile %}
+<div style="background: white; border-radius: 12px; border: 1px solid #d5e0d5; padding: 24px; margin-bottom: 24px;">
+    <h2 style="margin-bottom: 24px;">Withdrawal Method</h2>
+    {% if profile['withdrawal_method'] %}
+        <div style="background: #f9f9f9; padding: 16px; border-radius: 6px;">
+            {% if profile['withdrawal_method'] == 'paypal' %}
+                <p><strong>PayPal:</strong> {{ profile['wallet_address'] }}</p>
+            {% elif profile['withdrawal_method'] == 'crypto' %}
+                <p><strong>Cryptocurrency Wallet:</strong></p>
+                <p style="word-break: break-all;">{{ profile['wallet_address'] }}</p>
+            {% elif profile['withdrawal_method'] == 'bank_transfer' %}
+                <p><strong>Bank Transfer</strong></p>
+                <p><strong>Country:</strong> {{ profile['bank_code'] }}</p>
+                <p><strong>Bank:</strong> {{ profile['bank_name'] }}</p>
+                <p><strong>Account Holder:</strong> {{ profile['bank_account_holder'] }}</p>
+                <p><strong>Account Number:</strong> {{ profile['bank_account_number'] }}</p>
+            {% endif %}
+        </div>
+    {% else %}
+        <p style="color: #5e6d55;">No withdrawal method set up yet.</p>
+    {% endif %}
+    <p style="margin-top: 12px; font-size: 14px; color: #5e6d55;">
+        <a href="{{ url_for('settings') }}" style="color: #14a800; text-decoration: none;">Update withdrawal method</a>
+    </p>
+</div>
+{% endif %}
+
+<div style="background: white; border-radius: 12px; border: 1px solid #d5e0d5; padding: 24px;">
+    <h2 style="margin-bottom: 24px;">Transaction History</h2>
+    
+    {% if transactions %}
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 2px solid #e8ede8;">
+                    <th style="text-align: left; padding: 12px; color: #5e6d55; font-weight: 600;">Date</th>
+                    <th style="text-align: left; padding: 12px; color: #5e6d55; font-weight: 600;">Description</th>
+                    <th style="text-align: left; padding: 12px; color: #5e6d55; font-weight: 600;">Type</th>
+                    <th style="text-align: right; padding: 12px; color: #5e6d55; font-weight: 600;">Amount</th>
+                    <th style="text-align: center; padding: 12px; color: #5e6d55; font-weight: 600;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for txn in transactions %}
+                    <tr style="border-bottom: 1px solid #e8ede8;">
+                        <td style="padding: 16px;">{{ txn['created_at'] }}</td>
+                        <td style="padding: 16px;">{{ txn['description'] if txn['description'] else txn['type'].title() }}</td>
+                        <td style="padding: 16px;">{{ txn['type'].title() }}</td>
+                        <td style="padding: 16px; text-align: right; font-weight: 600; {% if txn['type'] in ['payment', 'withdrawal', 'fee'] %}color: #d13415;{% else %}color: #14a800;{% endif %}">
+                            {% if txn['type'] in ['payment', 'withdrawal', 'fee'] %}-{% else %}+{% endif %}${{ "%.2f"|format(txn['amount']) }}
+                        </td>
+                        <td style="padding: 16px; text-align: center;">
+                            <span class="stats-badge" style="{% if txn['status'] == 'completed' %}background: #e7f6e4;{% elif txn['status'] == 'failed' %}background: #fef3f2; color: #d13415;{% endif %}">
+                                {{ txn['status'].title() }}
+                            </span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="text-align: center; color: #5e6d55; padding: 40px;">No transactions yet</p>
+    {% endif %}
+</div>
+{% endblock %}

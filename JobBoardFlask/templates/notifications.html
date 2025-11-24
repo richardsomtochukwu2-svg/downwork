@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Notifications</h1>
+    <p>Stay updated with your activity</p>
+</div>
+
+{% if notifications %}
+    <div style="background: white; border-radius: 12px; border: 1px solid #d5e0d5;">
+        {% for notif in notifications %}
+            <div style="padding: 20px; border-bottom: 1px solid #e8ede8; {% if not notif['is_read'] %}background: #f2f7f2;{% endif %}">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                    <strong style="font-size: 16px;">{{ notif['title'] }}</strong>
+                    <small style="color: #5e6d55;">{{ notif['created_at'] }}</small>
+                </div>
+                <p style="color: #5e6d55; margin: 0;">{{ notif['message'] }}</p>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h3>No notifications</h3>
+        <p>You're all caught up!</p>
+    </div>
+{% endif %}
+{% endblock %}

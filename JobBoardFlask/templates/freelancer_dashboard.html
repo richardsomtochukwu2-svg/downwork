@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}My Proposals - JobMarket{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>My Dashboard</h1>
+    <p>Track your proposals and active projects</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 40px;">
+    <div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #d5e0d5; text-align: center;">
+        <p style="color: #5e6d55; margin-bottom: 8px;">Balance</p>
+        <h2 style="font-size: 28px; color: #14a800;">${{ "%.2f"|format(balance) }}</h2>
+        <a href="{{ url_for('wallet') }}" class="btn btn-outline btn-small" style="margin-top: 12px;">View Wallet</a>
+    </div>
+    
+    {% if profile %}
+        <div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #d5e0d5; text-align: center;">
+            <p style="color: #5e6d55; margin-bottom: 8px;">Jobs Completed</p>
+            <h2 style="font-size: 28px;">{{ profile['total_jobs'] }}</h2>
+            {% if profile['rating'] and profile['rating'] > 0 %}
+                <p style="margin-top: 8px; color: #14a800;">⭐ {{ "%.1f"|format(profile['rating']) }}</p>
+            {% endif %}
+        </div>
+        
+        <div style="background: white; padding: 24px; border-radius: 12px; border: 1px solid #d5e0d5; text-align: center;">
+            <p style="color: #5e6d55; margin-bottom: 8px;">Hourly Rate</p>
+            <h2 style="font-size: 28px;">${{ profile['hourly_rate'] if profile['hourly_rate'] else '0' }}/hr</h2>
+            <a href="{{ url_for('edit_profile') }}" class="btn btn-outline btn-small" style="margin-top: 12px;">Edit Profile</a>
+        </div>
+    {% endif %}
+</div>
+
+<div class="action-bar" style="margin-bottom: 32px;">
+    <div></div>
+    <a href="{{ url_for('browse_jobs') }}" class="btn">Browse More Jobs</a>
+</div>
+
+<!-- Active Contracts -->
+{% if contracts %}
+    <div style="margin-bottom: 40px;">
+        <h2 style="margin-bottom: 24px;">Active Projects</h2>
+        <div class="jobs-grid">
+            {% for contract in contracts %}
+                <div class="job-card">
+                    <h3 class="job-title">{{ contract['job_title'] }}</h3>
+                    <p style="margin-bottom: 16px;">
+                        <strong>Client:</strong> 
+                        <a href="{{ url_for('view_profile', user_id=contract['client_id']) }}">{{ contract['client_name'] }}</a>
+                    </p>
+                    <div class="job-footer">
+                        <span><strong>Amount:</strong> ${{ contract['amount'] }}</span>
+                        <a href="{{ url_for('message_thread', other_user_id=contract['client_id']) }}" class="btn btn-small">Message Client</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<!-- Proposals -->
+<h2 style="margin-bottom: 24px;">My Proposals</h2>
+
+{% if proposals %}
+    <div class="jobs-grid">
+        {% for proposal in proposals %}
+        <div class="job-card">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                <h3 class="job-title">
+                    <a href="{{ url_for('view_job', job_id=proposal['job_id']) }}">{{ proposal['job_title'] }}</a>
+                </h3>
+                <span class="stats-badge" style="{% if proposal['status'] == 'pending' %}background: #fff3cd; color: #856404;{% elif proposal['status'] == 'accepted' %}background: #e7f6e4;{% else %}background: #f8d7da; color: #721c24;{% endif %}">
+                    {{ proposal['status'].title() }}
+                </span>
+            </div>
+            <div class="job-meta">
+                <span class="job-meta-item">Client: <strong>{{ proposal['client_name'] }}</strong></span>
+                <span class="job-meta-item">Applied {{ proposal['applied_at'] }}</span>
+            </div>
+            <div class="job-footer">
+                <span><strong>Your Bid:</strong> ${{ proposal['bid_amount'] }}</span>
+                {% if proposal['status'] == 'pending' %}
+                    <a href="{{ url_for('view_job', job_id=proposal['job_id']) }}" class="btn btn-small">View Job</a>
+                {% elif proposal['status'] == 'accepted' %}
+                    <a href="{{ url_for('message_thread', other_user_id=proposal['client_id']) }}" class="btn btn-small">Message Client</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <h3>You haven't submitted any proposals yet</h3>
+        <p>Start browsing jobs and submit proposals to projects that match your skills</p>
+        <a href="{{ url_for('browse_jobs') }}" class="btn btn-large">Browse Jobs</a>
+    </div>
+{% endif %}
+{% endblock %}

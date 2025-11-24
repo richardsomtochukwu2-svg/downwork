@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Review{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Submit Review</h1>
+    <p>Share your experience with {{ reviewee['username'] }}</p>
+</div>
+
+<div style="max-width: 600px; margin: 0 auto;">
+    <div style="background: white; padding: 40px; border-radius: 12px; border: 1px solid #d5e0d5;">
+        <div style="margin-bottom: 32px; padding: 20px; background: #f9faf9; border-radius: 8px;">
+            <h3 style="margin-bottom: 8px;">{{ job['title'] }}</h3>
+            <p style="color: #5e6d55;">Reviewing: <strong>{{ reviewee['username'] }}</strong></p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('submit_review', contract_id=contract['id']) }}">
+            <div class="form-group">
+                <label for="rating">Rating</label>
+                <select id="rating" name="rating" required>
+                    <option value="">Select a rating</option>
+                    <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                    <option value="4">⭐⭐⭐⭐ Very Good</option>
+                    <option value="3">⭐⭐⭐ Good</option>
+                    <option value="2">⭐⭐ Fair</option>
+                    <option value="1">⭐ Poor</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="comment">Review (Optional)</label>
+                <textarea id="comment" name="comment" 
+                          placeholder="Share details about your experience working with this person..."></textarea>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 32px;">
+                <button type="submit" class="btn">Submit Review</button>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Skip for now</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
